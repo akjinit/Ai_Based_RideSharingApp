@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { UserDataContext } from "../context/UserContext";
 import axios from "axios";
@@ -6,10 +6,16 @@ import axios from "axios";
 const UserLogin = () => {
   const [email, setEmail] = useState("akshatiiit@gmail.com");
   const [password, setPassword] = useState("7777777");
-  const [userData, setUserData] = useState("{}");
 
   const navigate = useNavigate();
   const { user, setUser } = useContext(UserDataContext);
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      navigate('/home');
+    }
+  }, [navigate]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
@@ -19,15 +25,19 @@ const UserLogin = () => {
       password,
     };
 
-    const response = await axios.post(
-      `${import.meta.env.VITE_BASE_URL}/users/login`,
-      newUserLoginData
-    );
-    if (response.status === 200) {
-      const data = response.data;
-      setUser(data.user);
-      localStorage.setItem('token', data.token);
-      navigate("/home");
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/users/login`,
+        newUserLoginData
+      );
+      if (response.status === 200) {
+        const data = response.data;
+        setUser(data.user);
+        localStorage.setItem('token', data.token);
+        navigate("/home");
+      }
+    } catch (error) {
+      console.error("Login failed", error);
     }
 
     setEmail("");
@@ -35,62 +45,60 @@ const UserLogin = () => {
   };
 
   return (
-    <div className="p-7 flex h-screen flex-col justify-between">
+    <div className="p-7 flex h-screen flex-col justify-between bg-slate-900 text-white">
       <div>
-        <h1 className="text-4xl font-bold mb-7 text-black">rideShare</h1>
-        <form action="" onSubmit={submitHandler}>
-          <h3
-            className="
-          text-lg text-medium
-          mb-2"
-          >
-            What's your email
-          </h3>
+        <h1 className="text-4xl font-extrabold tracking-tight mb-10 text-white">
+          ride<span className="text-indigo-400">Share</span>
+        </h1>
+        
+        <div className="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl">
+          <form onSubmit={submitHandler}>
+            <div className="mb-5">
+              <label className="text-sm font-medium text-gray-300 mb-2 block">
+                Email Address
+              </label>
+              <input
+                required
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="bg-slate-800/50 border border-slate-700 w-full text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white"
+                placeholder="email@example.com"
+              />
+            </div>
 
-          <input
-            required
-            type="email"
-            value={email}
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-            className="bg-[#eeeeee] w-full mb-7 text-lg placeholder:text-base rounded px-2 py-2  "
-            placeholder="email@example.com"
-          />
+            <div className="mb-8">
+              <label className="text-sm font-medium text-gray-300 mb-2 block">
+                Password
+              </label>
+              <input
+                required
+                type="password"
+                className="bg-slate-800/50 border border-slate-700 w-full text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-white"
+                placeholder="Enter password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div>
 
-          <h3
-            className="
-        text-lg text-medium
-        mb-2 
-        "
-          >
-            Enter password
-          </h3>
+            <button className="bg-indigo-500 hover:bg-indigo-600 transition-colors w-full text-lg font-semibold text-white px-4 py-3 rounded-xl shadow-lg shadow-indigo-500/30">
+              Login
+            </button>
+          </form>
 
-          <input
-            type="password"
-            className="bg-[#eeeeee] w-full mb-7 text-lg placeholder:text-base rounded px-2 py-2 "
-            placeholder="password"
-            value={password}
-            onChange={(e) => {
-              setPassword(e.target.value);
-            }}
-          />
-          <button className="bg-black w-full mb-7 text-lg text-white  px-2 py-2 rounded">
-            Login
-          </button>
-        </form>
-
-        <p>New here?</p>
-        <Link to={"/signup"} className="text-blue-600">
-          Create new account
-        </Link>
+          <p className="text-center mt-6 text-gray-400 text-sm">
+            New here?{" "}
+            <Link to={"/signup"} className="text-indigo-400 hover:text-indigo-300 font-medium transition-colors">
+              Create an account
+            </Link>
+          </p>
+        </div>
       </div>
 
       <div>
         <Link
           to={"/captain-login"}
-          className="bg-[#33ba72] flex justify-center w-full mb-7 text-lg text-white  px-2 py-2 rounded"
+          className="bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/30 transition-colors flex justify-center w-full text-lg font-medium text-emerald-400 px-4 py-3 rounded-xl"
         >
           Sign in as Captain
         </Link>

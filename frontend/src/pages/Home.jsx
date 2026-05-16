@@ -350,87 +350,84 @@ const Home = () => {
 
       </div>
 
-      <div className=" flex  flex-col justify-end h-screen bottom-0 absolute w-full pointer-events-none">
-        <div className=" min-h-[20%] p-4 bg-white relative rounded-t-2xl pointer-events-auto">
-          <img
-            onClick={() => {
-              setpickupPanelClose(true);
-            }}
-            src="arrow-down-wide-line.svg"
-            className={`w-6 absolute left-[47%] top-1  ${pickupPanelOpen ? "hidden" : ""
-              }`}
-            alt=""
-          />
+      <div className=" flex flex-col justify-end h-screen bottom-0 absolute w-full pointer-events-none">
+        <div className="min-h-[20%] p-6 bg-white/95 backdrop-blur-xl relative rounded-t-[2rem] pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-t border-white/20">
+          <div 
+            onClick={() => setpickupPanelClose(true)}
+            className={`absolute left-1/2 -translate-x-1/2 top-3 w-12 h-1.5 bg-gray-300 rounded-full cursor-pointer hover:bg-gray-400 transition-colors ${pickupPanelOpen ? "hidden" : ""}`}
+          ></div>
 
-          <h4 className="text-[28px] font-semibold tracking-tighter">
+          <h4 className="text-2xl font-bold tracking-tight text-gray-900 mt-2">
             Find a trip
           </h4>
+          
           <button 
             type="button"
             onClick={fetchAiRecommendations}
-            className="w-full mt-3 py-2.5 bg-gradient-to-r from-indigo-50 to-purple-50 text-indigo-700 font-medium rounded-lg border border-indigo-100 flex items-center justify-center gap-2 hover:from-indigo-100 hover:to-purple-100 transition-colors shadow-sm"
+            className="w-full mt-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2 hover:from-indigo-600 hover:to-purple-600 transition-all shadow-md shadow-indigo-500/20"
           >
-            <i className="ri-magic-line text-lg"></i> AI: Explore Nearby
+            <i className="ri-magic-line text-xl"></i> AI: Explore Nearby
           </button>
+          
           <form
-            onSubmit={(e) => {
-              submitHandler(e);
-            }}
+            onSubmit={(e) => submitHandler(e)}
+            className="mt-4 flex flex-col gap-3"
           >
-            <input
-              className="bg-[#eee] px-12 py-3 text-base rounded-lg w-full mt-3"
-              type="text"
-              placeholder="Add a picup location"
-              onClick={() => {
-                setpickupPanelClose(false);
-              }}
-
-              onFocus={() => {
-                setPickupInputFocused(true);
-                setDestinationInputFocused(false);
-              }}
-              value={pickup}
-              onChange={(e) => {
-                setPickup(e.target.value);
-              }}
-            />
-            <input
-              className="bg-[#eee] px-12 py-3 text-base rounded-lg w-full mt-3"
-              type="text"
-              placeholder="Enter your destination"
-              onClick={() => {
-                setpickupPanelClose(false);
-              }}
-              onFocus={() => {
-                setDestinationInputFocused(true)
-                setPickupInputFocused(false);
-              }
-              }
-
-              value={destination}
-              onChange={(e) => {
-                setDestination(e.target.value);
-              }}
-            />
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-black rounded-full"></div>
+              <div className="absolute left-[1.1rem] top-[60%] w-0.5 h-8 bg-gray-300 z-10"></div>
+              <input
+                className="bg-gray-100/80 border border-gray-200 px-10 py-3.5 text-base font-medium rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black transition-all"
+                type="text"
+                placeholder="Add a pickup location"
+                onClick={() => setpickupPanelClose(false)}
+                onFocus={() => {
+                  setPickupInputFocused(true);
+                  setDestinationInputFocused(false);
+                }}
+                value={pickup}
+                onChange={(e) => setPickup(e.target.value)}
+              />
+            </div>
+            
+            <div className="relative">
+              <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-indigo-500 rounded-sm"></div>
+              <input
+                className="bg-gray-100/80 border border-gray-200 px-10 py-3.5 text-base font-medium rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                type="text"
+                placeholder="Enter your destination"
+                onClick={() => setpickupPanelClose(false)}
+                onFocus={() => {
+                  setDestinationInputFocused(true)
+                  setPickupInputFocused(false);
+                }}
+                value={destination}
+                onChange={(e) => setDestination(e.target.value)}
+              />
+            </div>
           </form>
         </div>
-        <div className={`bg-white h-[70%] flex flex-col pointer-events-auto ${pickupPanelOpen ? "hidden" : ""}`}>
-          <button className="  bg-black p-2 mx-3.5 rounded-md mb-2 text-white font-semibold" onClick={async () => {
-            const fareDetails = await fetchFareEstimate(pickup, destination);
-            setFare(fareDetails);
-            setvehiclePanelOpen(true);
-            setpickupPanelClose(true);
-          }} >
-
-            Confirm Pickup
-          </button>
-          <LocationSearchPanel
-            pickupInputFocused={pickupInputFocused}
-            destinationInputFocused={destinationInputFocused}
-            suggestions={suggestions}
-            setPickup={setPickup}
-            setDestination={setDestination}
-          />
+        
+        <div className={`bg-white/95 backdrop-blur-xl h-[70%] flex flex-col pointer-events-auto ${pickupPanelOpen ? "hidden" : ""}`}>
+          <div className="px-6 pb-2">
+            <button className="bg-black w-full py-3.5 rounded-xl text-white font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg shadow-black/20" onClick={async () => {
+              const fareDetails = await fetchFareEstimate(pickup, destination);
+              setFare(fareDetails);
+              setvehiclePanelOpen(true);
+              setpickupPanelClose(true);
+            }} >
+              Confirm Pickup
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto px-6">
+            <LocationSearchPanel
+              pickupInputFocused={pickupInputFocused}
+              destinationInputFocused={destinationInputFocused}
+              suggestions={suggestions}
+              setPickup={setPickup}
+              setDestination={setDestination}
+            />
+          </div>
         </div>
       </div>
 

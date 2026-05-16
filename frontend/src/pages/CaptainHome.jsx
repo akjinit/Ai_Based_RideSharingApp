@@ -118,48 +118,47 @@ const CaptainHome = () => {
 
 
   return (
-    <div className="h-screen relative">
-      <div className="h-3/5">
-        <div className="w-full px-3 fixed flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-black pointer-events-none">rideShare</h2>
-
-          <Link to="/captain/logout" className="h-10 w-10 bg-white flex items-center justify-center rounded-full">
-            <i className="text-lg font-medium ri-logout-box-r-line"></i>
-          </Link>
+    <div className="h-screen relative overflow-hidden bg-slate-900">
+      <div className="w-full px-5 py-4 fixed top-0 z-20 flex items-center justify-between">
+        <div className="bg-white/80 backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border border-white/20">
+          <h2 className="text-xl font-extrabold tracking-tight text-gray-900 pointer-events-none">
+            ride<span className="text-emerald-500">Captain</span>
+          </h2>
         </div>
-        <div className="h-screen w-screen absolute z-0">
-          {/* image for temp use */}
-          <MapContainer
-            center={[location.lat, location.lng]}
-            zoom={14}
-            className="h-full w-full "
-          >
 
-            <TileLayer
-              attribution="© OpenStreetMap"
-              className=""
-              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            />
-
-            <Marker position={[location.lat, location.lng]} icon={icon}>
-            </Marker>
-
-          </MapContainer>
-
-        </div>
+        <Link to="/captain/logout" className="h-12 w-12 bg-white/90 backdrop-blur-md flex items-center justify-center rounded-xl shadow-sm border border-white/20 hover:bg-white transition-colors text-red-500 hover:text-red-600">
+          <i className="text-xl font-medium ri-logout-box-r-line"></i>
+        </Link>
       </div>
 
-      <div className={`h-2/5 p-6 rounded-t-2xl fixed w-full z-10 bottom-0 bg-white transition-transform duration-500 overflow-y-scroll ${captainDetailsPanelOpen ? 'translate-y-0' : 'translate-y-[80%]'}`}>
+      <div className="h-screen w-screen absolute z-0">
+        <MapContainer
+          center={[location.lat, location.lng]}
+          zoom={14}
+          className="h-full w-full"
+        >
+          <TileLayer
+            attribution="© OpenStreetMap"
+            className=""
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <Marker position={[location.lat, location.lng]} icon={icon}></Marker>
+        </MapContainer>
+      </div>
 
+      <div className={`h-[45%] p-6 rounded-t-[2.5rem] fixed w-full z-10 bottom-0 bg-white/95 backdrop-blur-xl transition-transform duration-500 overflow-y-scroll shadow-[0_-10px_40px_rgba(0,0,0,0.15)] border-t border-white/40 ${captainDetailsPanelOpen ? 'translate-y-0' : 'translate-y-[85%]'}`}>
         <div
           onClick={() => setCaptainDetailsPanelOpen(!captainDetailsPanelOpen)}
-          className="absolute top-0 left-0 w-full flex justify-center py-2 cursor-pointer hover:bg-gray-100 rounded-t-2xl"
+          className="absolute top-0 left-0 w-full flex justify-center py-4 cursor-pointer"
         >
-          <i className={`text-3xl text-gray-400 ri-arrow-${captainDetailsPanelOpen ? 'down' : 'up'}-wide-line`}></i>
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full hover:bg-gray-400 transition-colors"></div>
         </div>
 
-        <CaptainDetails />
+        <div className="mt-4">
+          <CaptainDetails />
+        </div>
       </div>
+
       <RidePopup ride={ride} acceptRideHandler={acceptRideHandler} setRidePopupPanel={setRidePopupPanel} ridePopupPanel={ridePopupPanel} />
       <ConfirmRidePopup ride={ride} confirmRidePopupPanel={confirmRidePopupPanel} setConfirmRidePopupPanel={setConfirmRidePopupPanel} />
     </div>

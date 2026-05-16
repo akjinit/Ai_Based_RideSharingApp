@@ -265,13 +265,18 @@ const CaptainRiding = () => {
     }, [savedRide]);
 
     return (
-        <div className="h-screen flex flex-col">
+        <div className="h-screen flex flex-col bg-slate-900 relative overflow-hidden">
             {/* Map Section */}
-            <div className="flex-1 relative">
-                <div className="w-full px-3 fixed flex items-center justify-end z-10 top-0 bg-white bg-opacity-90 py-3 shadow-md">
+            <div className="h-[55%] relative z-0">
+                <div className="w-full px-4 fixed flex items-center justify-between z-20 top-4">
+                    <div className="bg-white/90 backdrop-blur-md px-4 py-2 rounded-xl shadow-sm border border-white/20">
+                        <h2 className="text-xl font-extrabold tracking-tight text-gray-900">
+                            ride<span className="text-emerald-500">Captain</span>
+                        </h2>
+                    </div>
                     <Link to="/captain-home">
-                        <button className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded-lg transition">
-                            End Ride
+                        <button className="bg-red-500/90 backdrop-blur-md hover:bg-red-600 text-white font-semibold px-5 py-2.5 rounded-xl shadow-lg border border-red-400/50 transition-all">
+                            End Early
                         </button>
                     </Link>
                 </div>
@@ -305,67 +310,80 @@ const CaptainRiding = () => {
 
                     {/* Route polyline */}
                     {routeCoordinates.length > 0 && (
-                        <Polyline positions={routeCoordinates} color="blue" weight={4} />
+                        <Polyline positions={routeCoordinates} color="#10b981" weight={5} />
                     )}
                 </MapContainer>
             </div>
 
             {/* Ride Info Section */}
-            <div className="bg-white rounded-t-2xl shadow-2xl p-5">
-                {/* Header */}
-                <div className="flex justify-between items-center mb-4 pb-3 border-b-2 border-gray-200">
-                    <div>
-                        <h3 className="font-bold text-lg">
-                            {savedRide.userId?.fullName?.firstName} {savedRide.userId?.fullName?.lastName}
-                        </h3>
-                        <p className="text-sm text-gray-600">{savedRide.userId?.email}</p>
-                    </div>
-                    <span className={`px-4 py-2 rounded-full text-sm font-bold text-white ${savedRide.status === 'in_progress' ? 'bg-green-500' : 'bg-blue-500'
-                        }`}>
-                        {savedRide.status?.toUpperCase()}
-                    </span>
+            <div className="h-[45%] bg-white/95 backdrop-blur-xl rounded-t-[2.5rem] absolute bottom-0 w-full z-10 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] border-t border-white/40 p-6 flex flex-col">
+                <div className="absolute top-0 left-0 w-full flex justify-center py-4">
+                    <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
                 </div>
 
-                {/* Route Info */}
-                <div className="mb-4 space-y-3">
-                    <div className="flex gap-3">
-                        <span className="text-xl">📍</span>
+                <div className="flex-1 overflow-y-auto mt-4">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-6">
                         <div>
-                            <p className="text-xs text-gray-500 font-semibold">PICKUP</p>
-                            <p className="text-sm font-medium">{savedRide.origin}</p>
+                            <h3 className="font-bold text-xl text-gray-900">
+                                {savedRide.userId?.fullName?.firstName} {savedRide.userId?.fullName?.lastName}
+                            </h3>
+                            <p className="text-sm text-gray-500 font-medium">{savedRide.userId?.email}</p>
+                        </div>
+                        <span className={`px-4 py-1.5 rounded-full text-xs font-bold shadow-sm ${savedRide.status === 'in_progress' ? 'bg-emerald-100 text-emerald-700 border border-emerald-200' : 'bg-blue-100 text-blue-700 border border-blue-200'
+                            }`}>
+                            {savedRide.status === 'in_progress' ? 'EN ROUTE' : savedRide.status?.toUpperCase()}
+                        </span>
+                    </div>
+
+                    {/* Route Info */}
+                    <div className="bg-gray-50/80 border border-gray-100 rounded-2xl p-4 mb-6 space-y-4">
+                        <div className="flex gap-4 items-start">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center shrink-0">
+                                <i className="ri-map-pin-line"></i>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500 font-semibold mb-1">PICKUP</p>
+                                <p className="text-sm font-bold text-gray-900 leading-tight">{savedRide.origin}</p>
+                            </div>
+                        </div>
+                        
+                        <div className="ml-4 border-l-2 border-dashed border-gray-300 h-4 -my-2"></div>
+                        
+                        <div className="flex gap-4 items-start">
+                            <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
+                                <i className="ri-map-pin-user-fill"></i>
+                            </div>
+                            <div>
+                                <p className="text-xs text-gray-500 font-semibold mb-1">DESTINATION</p>
+                                <p className="text-sm font-bold text-gray-900 leading-tight">{savedRide.destination}</p>
+                            </div>
                         </div>
                     </div>
-                    <div className="flex gap-3">
-                        <span className="text-xl">🎯</span>
-                        <div>
-                            <p className="text-xs text-gray-500 font-semibold">DESTINATION</p>
-                            <p className="text-sm font-medium">{savedRide.destination}</p>
+
+                    {/* Stats Grid */}
+                    <div className="grid grid-cols-3 gap-3 mb-6">
+                        <div className="bg-white border border-gray-100 rounded-2xl p-3 text-center shadow-sm">
+                            <p className="text-xs text-gray-500 font-semibold mb-1">DISTANCE</p>
+                            <p className="font-bold text-lg text-gray-900">{(savedRide.distance / 1000).toFixed(1)} <span className="text-sm font-medium text-gray-500">km</span></p>
+                        </div>
+                        <div className="bg-white border border-gray-100 rounded-2xl p-3 text-center shadow-sm">
+                            <p className="text-xs text-gray-500 font-semibold mb-1">TIME</p>
+                            <p className="font-bold text-lg text-gray-900">{Math.round(savedRide.duration / 60)} <span className="text-sm font-medium text-gray-500">min</span></p>
+                        </div>
+                        <div className="bg-emerald-50 border border-emerald-100 rounded-2xl p-3 text-center shadow-sm">
+                            <p className="text-xs text-emerald-600 font-semibold mb-1">FARE</p>
+                            <p className="font-bold text-xl text-emerald-600">₹{Math.round(savedRide.fare)}</p>
                         </div>
                     </div>
-                </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-3 gap-3 mb-4 py-3 border-y border-gray-200">
-                    <div className="text-center">
-                        <p className="text-xs text-gray-500 font-semibold">DISTANCE</p>
-                        <p className="font-bold text-lg">{(savedRide.distance / 1000).toFixed(2)} km</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-xs text-gray-500 font-semibold">DURATION</p>
-                        <p className="font-bold text-lg">{Math.round(savedRide.duration / 60)} min</p>
-                    </div>
-                    <div className="text-center">
-                        <p className="text-xs text-gray-500 font-semibold">FARE</p>
-                        <p className="font-bold text-lg text-green-600">₹{Math.round(savedRide.fare)}</p>
-                    </div>
+                    {/* Finish Ride Button */}
+                    <button
+                        onClick={() => setFinishRidePanel(true)}
+                        className="w-full bg-emerald-500 hover:bg-emerald-600 shadow-lg shadow-emerald-500/30 text-white font-bold text-lg py-4 rounded-xl transition-all">
+                        Complete Journey
+                    </button>
                 </div>
-
-                {/* Finish Ride Button */}
-                <button
-                    onClick={() => setFinishRidePanel(true)}
-                    className="w-full bg-green-500 hover:bg-green-600 text-white font-bold py-3 rounded-lg transition">
-                    Finish Ride
-                </button>
             </div>
 
             <FinishRidePanel

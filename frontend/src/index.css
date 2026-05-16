@@ -1,5 +1,16 @@
 @import "tailwindcss";
 
-*{
+@theme {
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}
+
+* {
   box-sizing: border-box;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #111827; /* Dark background default */
+  color: #f3f4f6; /* Light text default */
 }

@@ -310,11 +310,11 @@ const Riding = () => {
 
   if (!ride) {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
+      <div className="h-screen flex items-center justify-center bg-slate-900">
         <div className="text-center">
-          <p className="text-lg mb-4 text-gray-600">Loading ride details...</p>
+          <p className="text-lg mb-4 text-gray-300">Loading your journey...</p>
           <div className="inline-block">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-500"></div>
           </div>
         </div>
       </div>
@@ -332,35 +332,36 @@ const Riding = () => {
   // Show ride completion modal
   if (ride.status === 'completed') {
     return (
-      <div className="h-screen flex items-center justify-center bg-gray-900 bg-opacity-75">
-        <div className="bg-white rounded-2xl p-8 text-center shadow-2xl">
-          <div className="text-6xl mb-4">✓</div>
-          <h2 className="text-3xl font-bold mb-2 text-gray-900">Ride Completed!</h2>
-          <p className="text-gray-600 mb-4">Thank you for riding with us</p>
-          <div className="bg-yellow-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-600">Total Distance</p>
-            <p className="text-2xl font-bold text-gray-900">{(ride.distance / 1000).toFixed(2)} KM</p>
+      <div className="h-screen flex items-center justify-center bg-slate-900 bg-opacity-95">
+        <div className="bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl p-10 text-center shadow-2xl max-w-sm w-full mx-4">
+          <div className="w-20 h-20 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,197,94,0.4)]">
+            <i className="ri-check-line text-4xl text-white"></i>
           </div>
-          <div className="bg-green-50 rounded-lg p-4 mb-6">
-            <p className="text-sm text-gray-600">Total Fare</p>
-            <p className="text-2xl font-bold text-green-600">₹{Math.round(ride.fare)}</p>
+          <h2 className="text-3xl font-bold mb-2 text-white">Journey Complete</h2>
+          <p className="text-gray-300 mb-8">Thank you for riding with rideShare</p>
+          
+          <div className="bg-slate-800/50 rounded-2xl p-5 mb-4 border border-slate-700">
+            <p className="text-sm text-gray-400 mb-1">Total Distance</p>
+            <p className="text-2xl font-bold text-white">{(ride.distance / 1000).toFixed(2)} KM</p>
           </div>
-          <p className="text-sm text-gray-500">Redirecting to home...</p>
+          
+          <div className="bg-emerald-500/10 rounded-2xl p-5 mb-8 border border-emerald-500/20">
+            <p className="text-sm text-emerald-400 mb-1">Total Fare</p>
+            <p className="text-3xl font-bold text-emerald-400">₹{Math.round(ride.fare)}</p>
+          </div>
+          
+          <p className="text-sm text-gray-500 animate-pulse">Redirecting to home...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-screen">
+    <div className="h-screen bg-slate-900 relative overflow-hidden">
       {/* MAP */}
-      <div className="h-1/2 relative">
-        <Link to="/home">
-          <img
-            src="home-line.svg"
-            className="fixed left-2 top-2 w-9 bg-gray-100 rounded-full p-2 z-10"
-            alt=""
-          />
+      <div className="h-[60%] relative z-0">
+        <Link to="/home" className="fixed left-4 top-4 w-12 h-12 bg-white/90 backdrop-blur-md flex items-center justify-center rounded-xl z-20 shadow-lg border border-white/20 hover:bg-white transition-colors">
+          <i className="ri-home-4-line text-2xl text-gray-800"></i>
         </Link>
 
         <MapContainer
@@ -390,70 +391,91 @@ const Riding = () => {
 
           {/* Route polyline */}
           {routeCoordinates.length > 0 && (
-            <Polyline positions={routeCoordinates} color="blue" weight={4} />
+            <Polyline positions={routeCoordinates} color="#6366f1" weight={5} />
           )}
         </MapContainer>
       </div>
 
       {/* RIDE INFO */}
-      <div className="h-1/2 p-4 overflow-y-auto">
-        {!ride ? (
-          <div className="flex items-center justify-center h-full">
-            <p className="text-gray-500">Loading ride information...</p>
-          </div>
-        ) : (
-          <>
-            <h3 className="text-2xl font-semibold mb-5">
-              {ride.status === 'in_progress' ? 'Ride Ongoing' : 'Ride Status: ' + ride.status}
-            </h3>
-
-            {/* Captain details */}
-            <div className="flex justify-between items-center">
-              <img src={vehicleImageMap[ride.vehicleType]} className="w-28" alt="" />
-
-              <div className="text-right">
-                <h2 className="text-lg font-medium">
-                  {ride.captainId?.fullName?.firstName || "Captain"}
-                </h2>
-                <h4 className="text-2xl font-semibold -mt-1 -mb-1">
-                  {ride.captainId?.vehicle?.plate || "—"}
-                </h4>
-                <p className="text-sm text-gray-500">
-                  {ride?.vehicleType || "Vehicle"}
-                </p>
-              </div>
+      <div className="h-[45%] p-6 rounded-t-[2.5rem] absolute w-full z-10 bottom-0 bg-white/95 backdrop-blur-xl shadow-[0_-10px_40px_rgba(0,0,0,0.15)] border-t border-white/40 overflow-y-auto">
+        <div className="absolute top-0 left-0 w-full flex justify-center py-4">
+          <div className="w-12 h-1.5 bg-gray-300 rounded-full"></div>
+        </div>
+        
+        <div className="mt-4">
+          {!ride ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-gray-500">Loading ride information...</p>
             </div>
-
-            {/* Route */}
-            <div className="flex flex-col gap-5 mt-4">
-              <div className="flex gap-5 p-2 border-b-2 border-gray-300">
-                <img src="map-user.svg" className="w-5" alt="" />
-                <div>
-                  <h3 className="text-lg font-medium">
-                    {ride.destination}
-                  </h3>
+          ) : (
+            <>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 tracking-tight">
+                  {ride.status === 'in_progress' ? (
+                    <span className="flex items-center gap-2">
+                      <span className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></span>
+                      En Route
+                    </span>
+                  ) : 'Status: ' + ride.status}
+                </h3>
+                <div className="bg-indigo-50 text-indigo-700 px-3 py-1 rounded-full text-sm font-semibold border border-indigo-100">
+                  {ride.otp}
                 </div>
               </div>
 
-              {/* Payment */}
-              <div className="flex gap-5 p-2">
-                <img src="cash-fill.svg" className="w-5" alt="" />
-                <div>
-                  <h3 className="text-lg font-medium">
-                    ₹{ride.fare}
-                  </h3>
-                  <p className="text-gray-600 text-sm">
-                    {ride.paymentMethod || "Cash / Card"}
+              {/* Captain details */}
+              <div className="flex justify-between items-center bg-gray-50/80 border border-gray-100 p-4 rounded-2xl mb-6 shadow-sm">
+                <img src={vehicleImageMap[ride.vehicleType]} className="w-24 object-contain" alt="" />
+
+                <div className="text-right">
+                  <h2 className="text-lg font-semibold text-gray-800">
+                    {ride.captainId?.fullName?.firstName || "Captain"}
+                  </h2>
+                  <h4 className="text-2xl font-bold text-gray-900 -mt-1">
+                    {ride.captainId?.vehicle?.plate || "—"}
+                  </h4>
+                  <p className="text-sm text-gray-500 font-medium">
+                    {ride?.vehicleType || "Vehicle"}
                   </p>
                 </div>
               </div>
-            </div>
 
-            <button className="mb-5 w-full mt-4 bg-green-400 p-3 text-white font-semibold rounded">
-              Make a Payment
-            </button>
-          </>
-        )}
+              {/* Route & Payment */}
+              <div className="flex flex-col gap-4">
+                <div className="flex items-start gap-4 p-4 bg-gray-50/80 border border-gray-100 rounded-2xl shadow-sm">
+                  <div className="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center shrink-0">
+                    <i className="ri-map-pin-user-fill text-xl"></i>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500 font-medium mb-1">Destination</p>
+                    <h3 className="text-base font-semibold text-gray-900 leading-tight">
+                      {ride.destination}
+                    </h3>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-4 p-4 bg-emerald-50/80 border border-emerald-100 rounded-2xl shadow-sm">
+                  <div className="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center shrink-0">
+                    <i className="ri-money-rupee-circle-fill text-xl"></i>
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-xs text-emerald-600/80 font-medium mb-1">Payment Amount</p>
+                    <h3 className="text-xl font-bold text-emerald-700">
+                      ₹{ride.fare}
+                    </h3>
+                  </div>
+                  <div className="bg-white px-3 py-1 rounded-lg border border-emerald-100 text-emerald-700 text-xs font-bold shadow-sm">
+                    {ride.paymentMethod || "CASH"}
+                  </div>
+                </div>
+              </div>
+
+              <button className="w-full mt-6 py-4 bg-emerald-500 text-white font-bold text-lg rounded-xl shadow-lg shadow-emerald-500/30 hover:bg-emerald-600 transition-colors">
+                Make Payment
+              </button>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );
