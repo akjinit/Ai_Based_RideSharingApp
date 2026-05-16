@@ -377,7 +377,7 @@ const Home = () => {
               <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-black rounded-full"></div>
               <div className="absolute left-[1.1rem] top-[60%] w-0.5 h-8 bg-gray-300 z-10"></div>
               <input
-                className="bg-gray-100/80 border border-gray-200 px-10 py-3.5 text-base font-medium rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black transition-all"
+                className="bg-gray-100/80 border border-gray-200 px-10 py-3.5 text-base font-medium text-gray-900 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-black transition-all placeholder:text-gray-500"
                 type="text"
                 placeholder="Add a pickup location"
                 onClick={() => setpickupPanelClose(false)}
@@ -393,7 +393,7 @@ const Home = () => {
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-indigo-500 rounded-sm"></div>
               <input
-                className="bg-gray-100/80 border border-gray-200 px-10 py-3.5 text-base font-medium rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                className="bg-gray-100/80 border border-gray-200 px-10 py-3.5 text-base font-medium text-gray-900 rounded-xl w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-gray-500"
                 type="text"
                 placeholder="Enter your destination"
                 onClick={() => setpickupPanelClose(false)}
