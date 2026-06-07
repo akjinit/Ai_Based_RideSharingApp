@@ -48,9 +48,9 @@ module.exports.getSuggestions = async (req, res, next) => {
         return res.status(400).json({ errors: errors.array() });
     }
 
-    const { input } = req.query;
+    const { input, lat, lng } = req.query;
     try {
-        const suggestions = await mapService.getSuggestions(input);
+        const suggestions = await mapService.getSuggestions(input, lat, lng);
         res.status(200).json(suggestions);
     }
     catch (err) {

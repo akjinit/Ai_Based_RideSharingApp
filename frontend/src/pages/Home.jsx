@@ -143,10 +143,11 @@ const Home = () => {
         },
         params: {
           input: query,
+          lat: location.lat,
+          lng: location.lng,
         }
       });
-      const addresses = response.data.map((item) => item.description);
-      setSuggestions(addresses);
+      setSuggestions(response.data);
     } catch (err) {
       console.log("Error fetching suggestions:", err);
     }

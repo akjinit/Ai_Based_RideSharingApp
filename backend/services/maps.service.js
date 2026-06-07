@@ -8,6 +8,158 @@ const NOMINATIM_HEADERS = {
     'User-Agent': 'RideShare-App/1.0'
 };
 
+const DEFAULT_SEARCH_COUNTRY_CODES = process.env.MAP_SEARCH_COUNTRY_CODES || 'in';
+const SUGGESTION_LIMIT = 8;
+
+const buildSearchViewbox = (latitude, longitude) => {
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        return null;
+    }
+
+    const offset = 0.6;
+    return [
+        (lng - offset).toFixed(6),
+        (lat + offset).toFixed(6),
+        (lng + offset).toFixed(6),
+        (lat - offset).toFixed(6),
+    ].join(',');
+};
+
+const getAddressPart = (address, keys) => {
+    if (!address) {
+        return '';
+    }
+
+    return keys.map(key => address[key]).find(Boolean) || '';
+};
+
+const formatSuggestion = (result) => {
+    const address = result.address || {};
+    const title = result.name ||
+        getAddressPart(address, ['amenity', 'building', 'shop', 'tourism', 'road', 'suburb', 'neighbourhood']) ||
+        result.display_name.split(',')[0];
+
+    const subtitleParts = [
+        getAddressPart(address, ['road', 'neighbourhood', 'suburb']),
+        getAddressPart(address, ['city', 'town', 'village', 'municipality', 'county']),
+        getAddressPart(address, ['state']),
+    ].filter(Boolean);
+
+    return {
+        place_id: result.place_id,
+        description: result.display_name,
+        main_text: title,
+        secondary_text: [...new Set(subtitleParts)].join(', '),
+        latitude: parseFloat(result.lat),
+        longitude: parseFloat(result.lon),
+        type: result.type,
+        category: result.class,
+    };
+};
+
+const getSuggestionScore = (result, input) => {
+    const query = input.toLowerCase();
+    const displayName = (result.display_name || '').toLowerCase();
+    const name = (result.name || '').toLowerCase();
+    const typeScores = {
+        house: 18,
+        building: 16,
+        residential: 14,
+        road: 12,
+        amenity: 10,
+        shop: 10,
+        tourism: 9,
+        railway: 8,
+        suburb: 4,
+        city: 2,
+        state: -6,
+        country: -10,
+    };
+
+    let score = Number(result.importance || 0) * 10;
+    score += typeScores[result.type] || typeScores[result.class] || 0;
+
+    if (name === query) {
+        score += 20;
+    } else if (name.startsWith(query)) {
+        score += 12;
+    } else if (displayName.includes(query)) {
+        score += 4;
+    }
+
+    return score;
+};
+
+const uniqueSuggestions = (results) => {
+    const seen = new Set();
+
+    return results.filter(result => {
+        const key = `${result.main_text}|${result.secondary_text}`.toLowerCase();
+        if (seen.has(key)) {
+            return false;
+        }
+
+        seen.add(key);
+        return true;
+    });
+};
+
+const formatPhotonSuggestion = (feature) => {
+    const properties = feature.properties || {};
+    const coordinates = feature.geometry?.coordinates || [];
+    const titleParts = [
+        properties.name,
+        properties.housenumber && properties.street ? `${properties.housenumber} ${properties.street}` : '',
+        properties.street,
+    ].filter(Boolean);
+    const subtitleParts = [
+        properties.district,
+        properties.city,
+        properties.state,
+        properties.country,
+    ].filter(Boolean);
+
+    return {
+        place_id: properties.osm_id || `${coordinates[1]},${coordinates[0]}`,
+        description: [
+            titleParts[0],
+            properties.street !== titleParts[0] ? properties.street : '',
+            properties.city,
+            properties.state,
+            properties.country,
+        ].filter(Boolean).join(', '),
+        main_text: titleParts[0] || properties.city || properties.country || 'Unknown place',
+        secondary_text: [...new Set(subtitleParts)].join(', '),
+        latitude: coordinates[1],
+        longitude: coordinates[0],
+        type: properties.osm_value,
+        category: properties.osm_key,
+    };
+};
+
+const getPhotonSuggestions = async (input, latitude, longitude) => {
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    const response = await axios.get(
+        'https://photon.komoot.io/api/',
+        {
+            params: {
+                q: input,
+                limit: SUGGESTION_LIMIT,
+                lang: 'en',
+                ...(Number.isFinite(lat) && Number.isFinite(lng) ? { lat, lon: lng } : {}),
+            },
+            headers: NOMINATIM_HEADERS,
+            timeout: 7000,
+        }
+    );
+
+    return (response.data?.features || []).map(formatPhotonSuggestion);
+};
+
 const isValidCoordinatePair = (value) => {
     if (typeof value !== 'string') {
         return false;
@@ -205,35 +357,49 @@ module.exports.getDistanceTime = async (origins, destinations) => {
     }
 };
 
-module.exports.getSuggestions = async (input) => {
+module.exports.getSuggestions = async (input, latitude, longitude) => {
     if (!input || input.trim().length === 0) {
         throw new Error('Query is required');
     }
 
     try {
-        const response = await axios.get(
-            'https://nominatim.openstreetmap.org/search',
-            {
-                params: {
-                    q: input.trim(),
-                    format: 'json',
-                    limit: 5,
-                    // Remove 'addressdetails' - it's causing 400 error
+        const trimmedInput = input.trim();
+        const viewbox = buildSearchViewbox(latitude, longitude);
+        const [photonSuggestions, response] = await Promise.all([
+            getPhotonSuggestions(trimmedInput, latitude, longitude).catch(err => {
+                console.error('Photon suggestions failed:', err.response?.status || err.message);
+                return [];
+            }),
+            axios.get(
+                'https://nominatim.openstreetmap.org/search',
+                {
+                    params: {
+                        q: trimmedInput,
+                        format: 'json',
+                        addressdetails: 1,
+                        namedetails: 1,
+                        limit: 15,
+                        countrycodes: DEFAULT_SEARCH_COUNTRY_CODES,
+                        dedupe: 1,
+                        ...(viewbox ? { viewbox, bounded: 0 } : {}),
+                    },
+                    headers: {
+                        'User-Agent': 'RideShare-App/1.0',
+                        'Accept-Language': 'en'
+                    },
+                    timeout: 10000,
                 },
-                headers: {
-                    'User-Agent': 'RideShare-App/1.0',
-                    'Accept-Language': 'en'
-                },
-                timeout: 10000,
-            }
-        );
+            )
+        ]);
 
-        return response.data.length > 0 ? response.data.map(result => ({
-            place_id: result.place_id,
-            description: result.display_name,
-            main_text: result.name || result.display_name.split(',')[0],
-            secondary_text: result.address ? Object.values(result.address).slice(1, 3).join(', ') : '',
-        })) : [];
+        return uniqueSuggestions(
+            [
+                ...photonSuggestions,
+                ...response.data
+                .sort((a, b) => getSuggestionScore(b, trimmedInput) - getSuggestionScore(a, trimmedInput))
+                .map(formatSuggestion),
+            ]
+        ).slice(0, SUGGESTION_LIMIT);
     }
     catch (err) {
         console.error('Nominatim Error:', err.response?.status, err.message);
