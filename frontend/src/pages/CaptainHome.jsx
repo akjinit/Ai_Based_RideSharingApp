@@ -5,7 +5,7 @@ import RidePopup from "../Components/RidePopup";
 import ConfirmRidePopup from "../Components/ConfirmRidePopup";
 import { CaptainDataContext } from "../context/CaptainContext";
 import { SocketDataContext } from "../context/SocketContext";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from 'leaflet'
 
 const icon = L.icon({
@@ -15,6 +15,16 @@ const icon = L.icon({
 });
 
 import axios from 'axios'
+
+const UpdateMapComponent = ({ location }) => {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView([location.lat, location.lng], 15);
+  }, [location, map]);
+
+  return null;
+}
 
 
 const CaptainHome = () => {
@@ -142,6 +152,7 @@ const CaptainHome = () => {
             className=""
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
+          <UpdateMapComponent location={location} />
           <Marker position={[location.lat, location.lng]} icon={icon}></Marker>
         </MapContainer>
       </div>
