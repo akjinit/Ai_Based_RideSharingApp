@@ -352,27 +352,27 @@ const Home = () => {
       </div>
 
       <div className=" flex flex-col justify-end h-screen bottom-0 absolute w-full pointer-events-none">
-        <div className="min-h-[20%] p-6 bg-white/95 backdrop-blur-xl relative rounded-t-[2rem] pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-t border-white/20">
+        <div className={`shrink-0 ${pickupPanelOpen ? "p-6" : "px-6 pt-5 pb-4"} bg-white/95 backdrop-blur-xl relative rounded-t-[2rem] pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-t border-white/20`}>
           <div 
             onClick={() => setpickupPanelClose(true)}
             className={`absolute left-1/2 -translate-x-1/2 top-3 w-12 h-1.5 bg-gray-300 rounded-full cursor-pointer hover:bg-gray-400 transition-colors ${pickupPanelOpen ? "hidden" : ""}`}
           ></div>
 
-          <h4 className="text-2xl font-bold tracking-tight text-gray-900 mt-2">
+          <h4 className={`${pickupPanelOpen ? "text-2xl mt-2" : "text-xl mt-1"} font-bold tracking-tight text-gray-900`}>
             Find a trip
           </h4>
           
           <button 
             type="button"
             onClick={fetchAiRecommendations}
-            className="w-full mt-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl flex items-center justify-center gap-2 hover:from-indigo-600 hover:to-purple-600 transition-all shadow-md shadow-indigo-500/20"
+            className={`w-full mt-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl items-center justify-center gap-2 hover:from-indigo-600 hover:to-purple-600 transition-all shadow-md shadow-indigo-500/20 ${pickupPanelOpen ? "flex" : "hidden"}`}
           >
             <i className="ri-magic-line text-xl"></i> AI: Explore Nearby
           </button>
           
           <form
             onSubmit={(e) => submitHandler(e)}
-            className="mt-4 flex flex-col gap-3"
+            className={`${pickupPanelOpen ? "mt-4" : "mt-3"} flex flex-col gap-3`}
           >
             <div className="relative">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-black rounded-full"></div>
@@ -409,7 +409,7 @@ const Home = () => {
           </form>
         </div>
         
-        <div className={`bg-white/95 backdrop-blur-xl h-[70%] flex flex-col pointer-events-auto ${pickupPanelOpen ? "hidden" : ""}`}>
+        <div className={`bg-white/95 backdrop-blur-xl flex-1 min-h-0 flex flex-col pointer-events-auto ${pickupPanelOpen ? "hidden" : ""}`}>
           <div className="px-6 pb-2">
             <button className="bg-black w-full py-3.5 rounded-xl text-white font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg shadow-black/20" onClick={async () => {
               const fareDetails = await fetchFareEstimate(pickup, destination);
@@ -442,6 +442,7 @@ const Home = () => {
            // Also make sure to open the destination suggestions / close the panel state if needed
            setpickupPanelClose(false);
            setDestinationInputFocused(true);
+           setPickupInputFocused(false);
         }}
       />
 
