@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const ConfirmRidePopup = (props) => {
     const [OTP, setOTP] = useState('');
@@ -39,13 +39,11 @@ const ConfirmRidePopup = (props) => {
         }
     }
 
-
     return (
         <div className={` ${confirmRidePopupPanel ? "translate-y-0" : "translate-y-[120%]"} w-full h-screen fixed z-30 bottom-0 bg-white/95 backdrop-blur-xl px-6 py-8 transition-transform duration-500 shadow-[0_-10px_40px_rgba(0,0,0,0.15)] flex flex-col`}>
-            
             <div className="flex-1 overflow-y-auto mt-4 pb-20">
                 <h3 className="text-3xl font-extrabold mb-6 tracking-tight text-gray-900">Confirm <span className="text-emerald-500">Ride</span></h3>
-                
+
                 <div className='bg-gradient-to-r from-emerald-50 to-emerald-100/50 border border-emerald-200 rounded-3xl p-4 flex items-center mb-6 justify-between shadow-sm'>
                     <div className='flex items-center gap-4'>
                         <div className="bg-white p-1 rounded-full shadow-sm">
@@ -57,7 +55,7 @@ const ConfirmRidePopup = (props) => {
                         {`${(ride?.distance / 1000).toFixed(2)} KM`}
                     </div>
                 </div>
-                
+
                 <div className="flex flex-col justify-center gap-5">
                     <div className="bg-gray-50/80 border border-gray-100 rounded-2xl p-4 space-y-4 shadow-sm">
                         <div className="flex gap-4 items-start">
@@ -69,9 +67,9 @@ const ConfirmRidePopup = (props) => {
                                 <h3 className="text-sm font-bold text-gray-900 leading-tight">{ride?.origin}</h3>
                             </div>
                         </div>
-                        
+
                         <div className="ml-4 border-l-2 border-dashed border-gray-300 h-4 -my-2"></div>
-                        
+
                         <div className="flex gap-4 items-start">
                             <div className="w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0">
                                 <i className="ri-map-pin-user-fill"></i>
@@ -81,9 +79,9 @@ const ConfirmRidePopup = (props) => {
                                 <h3 className="text-sm font-bold text-gray-900 leading-tight">{ride?.destination}</h3>
                             </div>
                         </div>
-                        
+
                         <div className="h-px w-full bg-gray-200 my-2"></div>
-                        
+
                         <div className="flex gap-4 items-center">
                             <div className="w-8 h-8 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
                                 <i className="ri-bank-card-fill"></i>
@@ -103,13 +101,13 @@ const ConfirmRidePopup = (props) => {
                             <div className="absolute left-4 top-1/2 -translate-y-1/2 w-8 h-8 bg-indigo-100 text-indigo-600 rounded-lg flex items-center justify-center">
                                 <i className="ri-key-2-fill"></i>
                             </div>
-                            <input 
-                                required 
-                                type="text" 
-                                value={OTP} 
-                                onChange={(e) => setOTP(e.target.value)} 
-                                className="bg-gray-100/80 border border-gray-200 pl-16 pr-6 py-5 font-mono text-xl tracking-[0.5em] font-bold text-gray-900 rounded-2xl w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-gray-400 placeholder:tracking-normal placeholder:font-medium" 
-                                placeholder='Enter OTP' 
+                            <input
+                                required
+                                type="text"
+                                value={OTP}
+                                onChange={(e) => setOTP(e.target.value)}
+                                className="bg-gray-100/80 border border-gray-200 pl-16 pr-6 py-5 font-mono text-xl tracking-[0.5em] font-bold text-gray-900 rounded-2xl w-full focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all placeholder:text-gray-400 placeholder:tracking-normal placeholder:font-medium"
+                                placeholder='Enter OTP'
                                 maxLength={4}
                             />
                         </div>

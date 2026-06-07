@@ -11,6 +11,8 @@ const WaitingForDriver = (props) => {
   };
 
   const captain = ride?.captainId;
+  const otp = ride?.OTP || ride?.otp;
+
   return (
     <div
       className={` ${waitingForDriver ? "translate-y-0" : "translate-y-[120%]"
@@ -43,7 +45,7 @@ const WaitingForDriver = (props) => {
             <h3 className="font-bold text-indigo-900">OTP</h3>
          </div>
          <p className="text-2xl font-black tracking-widest text-indigo-600 bg-white px-4 py-1.5 rounded-xl shadow-inner border border-indigo-50">
-            {ride?.otp?.split('').join(' ')}
+            {otp ? otp.toString().split('').join(' ') : '----'}
          </p>
       </div>
 
