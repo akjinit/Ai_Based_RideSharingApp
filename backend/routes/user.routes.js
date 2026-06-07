@@ -5,7 +5,7 @@ const userController = require("../controllers/user.controller");
 const authMiddleware = require("../middlewares/auth.middleware");
 const mapController = require("../controllers/map.controller");
 
-//google-api free version expired
+// Using free APIs: Nominatim (OpenStreetMap) for geocoding and Open Route Service for distance
 router.post(
   "/register",
   [
