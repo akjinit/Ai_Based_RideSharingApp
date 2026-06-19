@@ -409,27 +409,29 @@ const Home = () => {
           </form>
         </div>
         
-        <div className={`bg-white/95 backdrop-blur-xl flex-1 min-h-0 flex flex-col pointer-events-auto ${pickupPanelOpen ? "hidden" : ""}`}>
-          <div className="px-6 pb-2">
-            <button className="bg-black w-full py-3.5 rounded-xl text-white font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg shadow-black/20" onClick={async () => {
-              const fareDetails = await fetchFareEstimate(pickup, destination);
-              setFare(fareDetails);
-              setvehiclePanelOpen(true);
-              setpickupPanelClose(true);
-            }} >
-              Confirm Pickup
-            </button>
+        {!pickupPanelOpen && (
+          <div className="bg-white/95 backdrop-blur-xl flex-1 min-h-0 flex flex-col pointer-events-auto">
+            <div className="px-6 pb-2">
+              <button className="bg-black w-full py-3.5 rounded-xl text-white font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg shadow-black/20" onClick={async () => {
+                const fareDetails = await fetchFareEstimate(pickup, destination);
+                setFare(fareDetails);
+                setvehiclePanelOpen(true);
+                setpickupPanelClose(true);
+              }} >
+                Confirm Pickup
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto px-6">
+              <LocationSearchPanel
+                pickupInputFocused={pickupInputFocused}
+                destinationInputFocused={destinationInputFocused}
+                suggestions={suggestions}
+                setPickup={setPickup}
+                setDestination={setDestination}
+              />
+            </div>
           </div>
-          <div className="flex-1 overflow-y-auto px-6">
-            <LocationSearchPanel
-              pickupInputFocused={pickupInputFocused}
-              destinationInputFocused={destinationInputFocused}
-              suggestions={suggestions}
-              setPickup={setPickup}
-              setDestination={setDestination}
-            />
-          </div>
-        </div>
+        )}
       </div>
 
       <AiRecommendationsPanel 
