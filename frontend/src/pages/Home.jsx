@@ -256,7 +256,7 @@ const Home = () => {
     updateLocation();
     const locationInterval = setInterval(() => {
       updateLocation();
-    }, 8000);
+    }, 5000);
 
     return () => clearInterval(locationInterval);
   }, []);
