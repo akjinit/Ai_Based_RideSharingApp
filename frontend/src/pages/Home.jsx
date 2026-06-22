@@ -56,7 +56,10 @@ const Home = () => {
   const [suggestions, setSuggestions] = useState([]);
   const [fare, setFare] = useState({});
   const [selectedVehicle, setSelectedVehicle] = useState(null);
-  const [location, setLocation] = useState({ lat: 22.961074, lng: 88.433524 });
+
+  const userLocation = localStorage.getItem('userLocation');
+  const [location, setLocation] = useState( JSON.parse(userLocation) || { lat: 22.961074, lng: 88.433524 });
+
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
@@ -75,6 +78,8 @@ const Home = () => {
           lat: latitude,
           lng: longitude
         })
+
+        localStorage.setItem('userLocation',JSON.stringify(position.coords));
       }, (err) => {
         console.error("Error getting location:", err);
       });
