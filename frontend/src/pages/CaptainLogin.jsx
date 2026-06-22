@@ -49,7 +49,7 @@ const CaptainLogin = () => {
           ride<span className="text-emerald-400">Captain</span>
         </h1>
         
-        <div className="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl">
+        <div className="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl max-w-md mx-auto">
           <form onSubmit={submitHandler}>
             <div className="mb-5">
               <label className="text-sm font-medium text-gray-300 mb-2 block">
@@ -60,7 +60,7 @@ const CaptainLogin = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-slate-800/50 border border-slate-700 w-full text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                className="bg-slate-800/50 border border-slate-700 w-full text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                 placeholder="email@example.com"
               />
             </div>
@@ -72,14 +72,14 @@ const CaptainLogin = () => {
               <input
                 required
                 type="password"
-                className="bg-slate-800/50 border border-slate-700 w-full text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                className="bg-slate-800/50 border border-slate-700 w-full text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                 placeholder="Enter password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
 
-            <button className="bg-emerald-500 hover:bg-emerald-600 transition-colors w-full text-lg font-semibold text-white px-4 py-3 rounded-xl shadow-lg shadow-emerald-500/30">
+            <button className="bg-emerald-500 hover:bg-emerald-600 transition-colors w-full text-base font-semibold text-white px-4 py-2 rounded-lg shadow-sm shadow-emerald-500/20">
               Login
             </button>
           </form>

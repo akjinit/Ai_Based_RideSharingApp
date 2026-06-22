@@ -14,11 +14,15 @@ import CaptainProtectWrapper from "./pages/CaptainProtectWrapper";
 import Riding from "./pages/Riding";
 import CaptainRiding from "./pages/CaptainRiding";
 import CaptainLogout from "./pages/CaptainLogout";
+import NavBar from "./Components/NavBar";
+import Footer from "./Components/Footer";
 
 const App = () => {
   return (
-    <div>
-      <Routes>
+    <div className="min-h-screen flex flex-col">
+      <NavBar />
+      <main className="flex-1 pt-16 pb-20">
+        <Routes>
         <Route path="/" element={<Start />} />
         <Route
           path="/home"
@@ -44,7 +48,9 @@ const App = () => {
         <Route path="/captain/logout" element={<CaptainLogout />} />
         <Route path="/riding" element={<Riding />} />
         <Route path="/captain-riding" element={<CaptainRiding />} />
-      </Routes>
+        </Routes>
+      </main>
+      <Footer />
     </div>
   );
 };

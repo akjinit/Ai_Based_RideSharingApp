@@ -66,7 +66,7 @@ const CaptainSignup = () => {
           ride<span className="text-emerald-400">Captain</span>
         </h1>
         
-        <div className="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl">
+        <div className="bg-white/10 backdrop-blur-md border border-white/10 p-6 rounded-2xl shadow-xl max-w-md mx-auto">
           <form onSubmit={submitHandler}>
             <div className="mb-4">
               <label className="text-sm font-medium text-gray-300 mb-2 block">Captain's Name</label>
@@ -76,14 +76,14 @@ const CaptainSignup = () => {
                   type="text"
                   value={firstName}
                   onChange={(e) => setfirstName(e.target.value)}
-                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                   placeholder="First name"
                 />
                 <input
                   type="text"
                   value={lastName}
                   onChange={(e) => setlastName(e.target.value)}
-                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                   placeholder="Last name"
                 />
               </div>
@@ -96,7 +96,7 @@ const CaptainSignup = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="bg-slate-800/50 border border-slate-700 w-full text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                className="bg-slate-800/50 border border-slate-700 w-full text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                 placeholder="email@example.com"
               />
             </div>
@@ -106,7 +106,7 @@ const CaptainSignup = () => {
               <input
                 required
                 type="password"
-                className="bg-slate-800/50 border border-slate-700 w-full text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                className="bg-slate-800/50 border border-slate-700 w-full text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                 placeholder="Create password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -122,7 +122,7 @@ const CaptainSignup = () => {
                   type="text"
                   value={vehicleColor}
                   onChange={(e) => setVehicleColor(e.target.value)}
-                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                   placeholder="Vehicle Color"
                 />
                 <input
@@ -130,7 +130,7 @@ const CaptainSignup = () => {
                   type="text"
                   value={vehiclePlate}
                   onChange={(e) => setVehiclePlate(e.target.value)}
-                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                    className="bg-slate-800/50 border border-slate-700 w-1/2 text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                   placeholder="Vehicle Plate"
                 />
               </div>
@@ -141,14 +141,14 @@ const CaptainSignup = () => {
                   type="number"
                   value={vehicleCapacity}
                   onChange={(e) => setVehicleCapacity(e.target.value)}
-                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-base placeholder:text-gray-500 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
+                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-sm placeholder:text-gray-500 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-white"
                   placeholder="Capacity (Seats)"
                 />
                 <select
                   required
                   value={vehicleType}
                   onChange={(e) => setVehicleType(e.target.value)}
-                  className="bg-slate-800/50 border border-slate-700 w-1/2 text-base text-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+                    className="bg-slate-800/50 border border-slate-700 w-1/2 text-sm text-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
                 >
                   <option value="" disabled>Select Type</option>
                   <option value="car">Car</option>
