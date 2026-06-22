@@ -341,7 +341,10 @@ const Home = () => {
 
 
           {drivers.map((d) => {
-            return (<Marker key={d._id} position={[d.location.coordinates[1], d.location.coordinates[0]]} icon={leafLetIcons[d.vehicle.vehicleType]}></Marker>)
+            if (!d.location?.coordinates || d.location.coordinates.length < 2) return null;
+            const [lng, lat] = d.location.coordinates;
+            if (isNaN(lat) || isNaN(lng)) return null;
+            return (<Marker key={d._id} position={[lat, lng]} icon={leafLetIcons[d.vehicle.vehicleType]}></Marker>)
           })}
 
           {/* captainId,
