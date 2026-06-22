@@ -57,8 +57,17 @@ const Home = () => {
   const [fare, setFare] = useState({});
   const [selectedVehicle, setSelectedVehicle] = useState(null);
 
-  const userLocation = localStorage.getItem('userLocation');
-  const [location, setLocation] = useState( JSON.parse(userLocation) || { lat: 22.961074, lng: 88.433524 });
+  const [location, setLocation] = useState(() => {
+    const userLocation = localStorage.getItem('userLocation');
+    if (userLocation) {
+      try {
+        return JSON.parse(userLocation);
+      } catch (e) {
+        return { lat: 22.961074, lng: 88.433524 };
+      }
+    }
+    return { lat: 22.961074, lng: 88.433524 };
+  });
 
   const [aiPanelOpen, setAiPanelOpen] = useState(false);
   const [aiRecommendations, setAiRecommendations] = useState([]);
@@ -74,12 +83,12 @@ const Home = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const { latitude, longitude } = position.coords;
-        setLocation({
+        const locationData = {
           lat: latitude,
           lng: longitude
-        })
-
-        localStorage.setItem('userLocation',JSON.stringify(position.coords));
+        };
+        setLocation(locationData);
+        localStorage.setItem('userLocation', JSON.stringify(locationData));
       }, (err) => {
         console.error("Error getting location:", err);
       });
@@ -341,10 +350,7 @@ const Home = () => {
 
 
           {drivers.map((d) => {
-            if (!d.location?.coordinates || d.location.coordinates.length < 2) return null;
-            const [lng, lat] = d.location.coordinates;
-            if (isNaN(lat) || isNaN(lng)) return null;
-            return (<Marker key={d._id} position={[lat, lng]} icon={leafLetIcons[d.vehicle.vehicleType]}></Marker>)
+            return (<Marker key={d._id} position={[d.location.coordinates[1], d.location.coordinates[0]]} icon={leafLetIcons[d.vehicle.vehicleType]}></Marker>)
           })}
 
           {/* captainId,
