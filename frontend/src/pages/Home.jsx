@@ -5,6 +5,7 @@ import ConfirmVehicle from "../Components/ConfirmVehicle";
 import WaitingForDriver from "../Components/WaitingForDriver";
 import LookingForDriver from "../Components/LookingForDriver";
 import AiRecommendationsPanel from "../Components/AiRecommendationsPanel";
+import Toast from "../Components/Toast";
 import axios from "axios";
 import { useEffect } from "react";
 import { SocketDataContext } from "../context/SocketContext";
@@ -73,8 +74,15 @@ const Home = () => {
   const [aiRecommendations, setAiRecommendations] = useState([]);
   const [isAiLoading, setIsAiLoading] = useState(false);
   const [drivers, setDrivers] = useState([]);
+  const [toast, setToast] = useState(null);
   const navigate = useNavigate();
   const { sendMessage, recieveMessage, socket } = useContext(SocketDataContext);
+
+  useEffect(() => {
+    if (!toast) return;
+    const timer = setTimeout(() => setToast(null), 4000);
+    return () => clearTimeout(timer);
+  }, [toast]);
 
   const { user } = useContext(UserDataContext);
   const [ride, setRide] = useState(null);
@@ -220,6 +228,13 @@ const Home = () => {
       return response.data;
     } catch (err) {
       console.log("Error fetching fare estimate:", err);
+      const message =
+        err.response?.data?.message ||
+        err.response?.data?.error?.message ||
+        err.response?.data?.errors?.[0]?.msg ||
+        "Unable to calculate ride distance. Check your pickup and destination and try again.";
+      setToast({ type: "error", message });
+      return null;
     }
   }
 
@@ -366,7 +381,7 @@ const Home = () => {
       </div>
 
       <div className=" flex flex-col justify-end h-screen bottom-0 absolute w-full pointer-events-none">
-        <div className={`shrink-0 ${pickupPanelOpen ? "p-6" : "px-6 pt-5 pb-4"} bg-white/95 backdrop-blur-xl relative rounded-t-[2rem] pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-t border-white/20`}>
+        <div className={`shrink-0 ${pickupPanelOpen ? "p-6" : "px-6 pt-5 pb-4"} bg-white/95 backdrop-blur-xl relative rounded-t-4xl pointer-events-auto shadow-[0_-10px_40px_rgba(0,0,0,0.1)] border-t border-white/20`}>
           <div 
             onClick={() => setpickupPanelClose(true)}
             className={`absolute left-1/2 -translate-x-1/2 top-3 w-12 h-1.5 bg-gray-300 rounded-full cursor-pointer hover:bg-gray-400 transition-colors ${pickupPanelOpen ? "hidden" : ""}`}
@@ -379,7 +394,7 @@ const Home = () => {
           <button 
             type="button"
             onClick={fetchAiRecommendations}
-            className={`w-full mt-4 py-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl items-center justify-center gap-2 hover:from-indigo-600 hover:to-purple-600 transition-all shadow-md shadow-indigo-500/20 ${pickupPanelOpen ? "flex" : "hidden"}`}
+            className={`w-full mt-4 py-3 bg-linear-to-r from-indigo-500 to-purple-500 text-white font-semibold rounded-xl items-center justify-center gap-2 hover:from-indigo-600 hover:to-purple-600 transition-all shadow-md shadow-indigo-500/20 ${pickupPanelOpen ? "flex" : "hidden"}`}
           >
             <i className="ri-magic-line text-xl"></i> AI: Explore Nearby
           </button>
@@ -428,6 +443,9 @@ const Home = () => {
             <div className="px-6 pb-2">
               <button className="bg-black w-full py-3.5 rounded-xl text-white font-semibold text-lg hover:bg-gray-800 transition-colors shadow-lg shadow-black/20" onClick={async () => {
                 const fareDetails = await fetchFareEstimate(pickup, destination);
+                if (!fareDetails) {
+                  return;
+                }
                 setFare(fareDetails);
                 setvehiclePanelOpen(true);
                 setpickupPanelClose(true);
@@ -461,6 +479,8 @@ const Home = () => {
            setPickupInputFocused(false);
         }}
       />
+
+      <Toast toast={toast} onClose={() => setToast(null)} />
 
       <VehiclePanel
         setvehiclePanelOpen={setvehiclePanelOpen}
