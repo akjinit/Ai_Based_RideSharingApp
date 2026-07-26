@@ -1,8 +1,8 @@
 const axios = require('axios');
 const captainModel = require('../models/captain.model');
 
-// Using free APIs: Nominatim (OpenStreetMap) for geocoding and OpenRouteService/OSRM for routes
-// No API keys required for Nominatim (fair use policy)
+// Geoapify is the primary geocoding/autocomplete provider. Public OpenStreetMap
+// services remain fallbacks so temporary provider failures do not break rides.
 
 const NOMINATIM_HEADERS = {
     'User-Agent': 'RideShare-App/1.0'
@@ -10,6 +10,15 @@ const NOMINATIM_HEADERS = {
 
 const DEFAULT_SEARCH_COUNTRY_CODES = process.env.MAP_SEARCH_COUNTRY_CODES || 'in';
 const SUGGESTION_LIMIT = 8;
+const GEOAPIFY_BASE_URL = 'https://api.geoapify.com/v1/geocode';
+
+const getGeoapifyApiKey = () => {
+    const apiKey = process.env.GEOAPIFY_API_KEY;
+    if (!apiKey) {
+        throw new Error('GEOAPIFY_API_KEY is not configured');
+    }
+    return apiKey;
+};
 
 const buildSearchViewbox = (latitude, longitude) => {
     const lat = parseFloat(latitude);
@@ -138,6 +147,41 @@ const formatPhotonSuggestion = (feature) => {
         type: properties.osm_value,
         category: properties.osm_key,
     };
+};
+
+const formatGeoapifySuggestion = (place) => {
+    const subtitleParts = [place.city, place.state, place.country].filter(Boolean);
+
+    return {
+        place_id: place.place_id || `${place.lat},${place.lon}`,
+        description: place.formatted || place.address_line1 || place.name,
+        main_text: place.name || place.address_line1 || place.formatted || 'Unknown place',
+        secondary_text: [...new Set(subtitleParts)].join(', '),
+        latitude: Number(place.lat),
+        longitude: Number(place.lon),
+        type: place.result_type,
+        category: place.categories?.[0],
+    };
+};
+
+const getGeoapifySuggestions = async (input, latitude, longitude) => {
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    const response = await axios.get(`${GEOAPIFY_BASE_URL}/autocomplete`, {
+        params: {
+            text: input,
+            format: 'json',
+            limit: SUGGESTION_LIMIT,
+            filter: `countrycode:${DEFAULT_SEARCH_COUNTRY_CODES}`,
+            ...(Number.isFinite(lat) && Number.isFinite(lng)
+                ? { bias: `proximity:${lng},${lat}` }
+                : {}),
+            apiKey: getGeoapifyApiKey(),
+        },
+        timeout: 7000,
+    });
+
+    return (response.data?.results || []).map(formatGeoapifySuggestion);
 };
 
 const getPhotonSuggestions = async (input, latitude, longitude) => {
@@ -274,6 +318,32 @@ const getRouteFromOsrm = async (origin, destination) => {
 };
 
 module.exports.getAddressCoordinate = async (address) => {
+    // Geoapify is the primary provider for ride creation and fare estimates.
+    try {
+        const response = await axios.get(`${GEOAPIFY_BASE_URL}/search`, {
+            params: {
+                text: address,
+                format: 'json',
+                limit: 1,
+                filter: `countrycode:${DEFAULT_SEARCH_COUNTRY_CODES}`,
+                apiKey: getGeoapifyApiKey(),
+            },
+            timeout: 7000,
+        });
+
+        const location = response.data?.results?.[0];
+        if (!location) {
+            throw new Error(`Unable to fetch coordinates for address: ${address}`);
+        }
+
+        return {
+            latitude: Number(location.lat),
+            longitude: Number(location.lon),
+        };
+    } catch (geoapifyError) {
+        console.error('Geoapify geocoding failed, using Nominatim fallback:', geoapifyError.response?.status || geoapifyError.message);
+    }
+
     try {
         const response = await axios.get(
             "https://nominatim.openstreetmap.org/search",
@@ -304,6 +374,25 @@ module.exports.getAddressCoordinate = async (address) => {
 };
 
 module.exports.getReverseGeocode = async (lat, lng) => {
+    try {
+        const response = await axios.get(`${GEOAPIFY_BASE_URL}/reverse`, {
+            params: {
+                lat,
+                lon: lng,
+                format: 'json',
+                apiKey: getGeoapifyApiKey(),
+            },
+            timeout: 7000,
+        });
+
+        const location = response.data?.results?.[0];
+        if (location?.formatted) {
+            return location.formatted;
+        }
+    } catch (geoapifyError) {
+        console.error('Geoapify reverse geocoding failed, using Nominatim fallback:', geoapifyError.response?.status || geoapifyError.message);
+    }
+
     try {
         const response = await axios.get(
             "https://nominatim.openstreetmap.org/reverse",
@@ -365,11 +454,11 @@ module.exports.getSuggestions = async (input, latitude, longitude) => {
     try {
         const trimmedInput = input.trim();
         const viewbox = buildSearchViewbox(latitude, longitude);
-        const [photonSuggestions, response] = await Promise.all([
-            getPhotonSuggestions(trimmedInput, latitude, longitude).catch(err => {
-                console.error('Photon suggestions failed:', err.response?.status || err.message);
-                return [];
-            }),
+        // Photon and Nominatim are independent public providers. A temporary
+        // failure or rate limit from either one must not make autocomplete fail.
+        const [geoapifyResult, photonResult, nominatimResult] = await Promise.allSettled([
+            getGeoapifySuggestions(trimmedInput, latitude, longitude),
+            getPhotonSuggestions(trimmedInput, latitude, longitude),
             axios.get(
                 'https://nominatim.openstreetmap.org/search',
                 {
@@ -384,7 +473,7 @@ module.exports.getSuggestions = async (input, latitude, longitude) => {
                         ...(viewbox ? { viewbox, bounded: 0 } : {}),
                     },
                     headers: {
-                        'User-Agent': 'RideShare-App/1.0',
+                        ...NOMINATIM_HEADERS,
                         'Accept-Language': 'en'
                     },
                     timeout: 10000,
@@ -392,10 +481,33 @@ module.exports.getSuggestions = async (input, latitude, longitude) => {
             )
         ]);
 
+        if (geoapifyResult.status === 'rejected') {
+            console.error('Geoapify suggestions failed:', geoapifyResult.reason.response?.status || geoapifyResult.reason.message);
+        }
+
+        if (photonResult.status === 'rejected') {
+            console.error('Photon suggestions failed:', photonResult.reason.response?.status || photonResult.reason.message);
+        }
+
+        if (nominatimResult.status === 'rejected') {
+            console.error('Nominatim suggestions failed:', nominatimResult.reason.response?.status || nominatimResult.reason.message);
+        }
+
+        const geoapifySuggestions = geoapifyResult.status === 'fulfilled'
+            ? geoapifyResult.value
+            : [];
+        const photonSuggestions = photonResult.status === 'fulfilled'
+            ? photonResult.value
+            : [];
+        const nominatimSuggestions = nominatimResult.status === 'fulfilled'
+            ? nominatimResult.value.data
+            : [];
+
         return uniqueSuggestions(
             [
+                ...geoapifySuggestions,
                 ...photonSuggestions,
-                ...response.data
+                ...nominatimSuggestions
                 .sort((a, b) => getSuggestionScore(b, trimmedInput) - getSuggestionScore(a, trimmedInput))
                 .map(formatSuggestion),
             ]

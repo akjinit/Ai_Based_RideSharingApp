@@ -23,7 +23,7 @@ const mapController = require('./controllers/map.controller');
 
 
 app.get("/", (req, res) => {
-  res.send("Hello world");
+  res.send("You have tried modifying the route. ");
 });
 
 

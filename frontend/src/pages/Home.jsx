@@ -158,20 +158,29 @@ const Home = () => {
   }
 
   const fetchSuggestions = async (query) => {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) {
+      setSuggestions([]);
+      return;
+    }
+
     try {
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         params: {
-          input: query,
+          input: trimmedQuery,
           lat: location.lat,
           lng: location.lng,
         }
       });
       setSuggestions(response.data);
     } catch (err) {
-      console.log("Error fetching suggestions:", err);
+      // Autocomplete is a convenience feature; retain the typed address and
+      // avoid showing stale suggestions when a provider is unavailable.
+      console.log("Error fetching suggestions:", err.response?.data?.message || err.message);
+      setSuggestions([]);
     }
   }
 

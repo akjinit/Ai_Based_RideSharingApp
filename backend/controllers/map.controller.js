@@ -54,8 +54,9 @@ module.exports.getSuggestions = async (req, res, next) => {
         res.status(200).json(suggestions);
     }
     catch (err) {
-        res.status(400).json({
-            message: "Suggestions not found"
+        console.error('Suggestion request failed:', err.message);
+        res.status(502).json({
+            message: "Location suggestions are temporarily unavailable"
         });
     }
 }
